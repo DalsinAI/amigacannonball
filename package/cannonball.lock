@@ -1,0 +1,8 @@
+# The upstream Cannonball the port builds (Chris White's enhanced OutRun
+# engine): fetched at this commit by package/build-amiga.sh, never kept in
+# this repository. The OutRun ROMs are never shipped: the player copies
+# their own (Install-Cannonball asks for them).
+CB_URL=https://github.com/djyt/cannonball
+CB_COMMIT=27493ebf62be3498dff93ed6a45e8e2db819bae1
+CB_VERSION=0.35
+PORT_VERSION=0.35-gfos1

@@ -1,0 +1,110 @@
+# Cannonball (the enhanced OutRun engine) for GFOS (AmigaOS 3.2 with
+# GFOpenUp), 68040/68060 + FPU, on GFOpenUp's SDL 2
+# (LIBS:GFOpenGPU/SDL2.module): drawn by SDL 2's renderer from a software
+# surface (upstream's sdl2/rendersurface.cpp, no OpenGL).
+#
+#   make -f amiga/Makefile.amigaos -j4 CB=/path/to/cannonball [STOVE=...]
+#
+# CB is upstream Cannonball at the commit package/cannonball.lock names,
+# with amiga/patches applied (package/build-amiga.sh fetches and patches
+# it). STOVE is a GFOpenAmigaGCC 16.2.0-open6 stove: its prefix/ has the
+# compiler, the NDK and GFOpenGPU's SDL 2 kit (prefix/m68k-amigaos).
+#
+# Boost is not used: amiga/compat/boost/ is our own small stand-in for the
+# few Boost calls Cannonball makes (the XML settings and scores, CRC-32,
+# starts_with/ends_with, a static assert).
+#
+# Output: build/amigaos/Cannonball/ (the drawer: Cannonball, Res/ with the
+# engine's tables and the Amiga settings, ROMs/ for the player's own OutRun
+# ROMs, User/, ReadMe, the licences, with GlowIcons),
+# build/amigaos/Cannonball.info and Install-Cannonball beside them.
+
+CB      ?= ../cannonball
+STOVE   ?= $(HOME)/AmiCradle/kitchen/stoves/os32-gcc16-open6
+PREFIX  ?= $(STOVE)/prefix
+SDL2KIT ?= $(PREFIX)/m68k-amigaos
+CC      = $(PREFIX)/bin/m68k-amigaos-gcc
+CXX     = $(PREFIX)/bin/m68k-amigaos-g++
+STRIP   = $(PREFIX)/bin/m68k-amigaos-strip
+# hard float: GFOpenGPU's SDL 2 kit is built -m68881
+CPU     ?= -m68040 -m68881
+# -fno-tree-loop-distribute-patterns: GCC 16's loop miscompile (the kit's
+# sdl2-config gives it for GCC 16 too).
+OPT     ?= -O2 -fomit-frame-pointer -fno-tree-loop-distribute-patterns -fno-math-errno
+# NOIX: libnix (tests/host builds with the host's C library: NOIX=)
+NOIX    ?= -noixemul
+
+DEFS    ?= -D__amigaos__
+INC     = -Iamiga/compat -I$(CB)/src/main -I$(SDL2KIT)/include/SDL2
+CFLAGS  = $(NOIX) $(OPT) $(CPU) $(DEFS) $(INC)
+CXXFLAGS = $(CFLAGS) -std=gnu++14 -Wno-deprecated-declarations
+LDFLAGS = $(NOIX) $(CPU)
+# libstdc++ on the open6 stove wants -lpthread -latomic
+LIBS    ?= -L$(SDL2KIT)/lib -lSDL2 -lpthread -latomic -lm
+
+BUILD   = build/amigaos
+OBJDIR  = $(BUILD)/obj
+OUT     = $(BUILD)/Cannonball
+PROG    = Cannonball
+
+# upstream's cmake/CMakeLists.txt list, with the software renderer
+GAME    = main romloader trackloader roms video utils \
+          frontend/cabdiag frontend/config frontend/menu frontend/ttrial \
+          hwvideo/hwroad hwvideo/hwsprites hwvideo/hwtiles \
+          hwaudio/segapcm hwaudio/soundchip hwaudio/ym2151 \
+          sdl2/audio sdl2/timer sdl2/input sdl2/renderbase sdl2/rendersurface \
+          directx/ffeedback \
+          engine/audio/osound engine/audio/osoundint engine/oanimseq engine/oattractai \
+          engine/obonus engine/ocrash engine/oferrari engine/ohiscore engine/ohud \
+          engine/oinitengine engine/oinputs engine/olevelobjs engine/ologo engine/omap \
+          engine/omusic engine/ooutputs engine/opalette engine/oroad engine/osmoke \
+          engine/osprite engine/osprites engine/ostats engine/otiles engine/otraffic \
+          engine/outils engine/outrun
+OBJS    = $(addprefix $(OBJDIR)/src/,$(addsuffix .o,$(GAME))) \
+          $(OBJDIR)/amiga/amiga_start.o
+SHIM    = $(wildcard amiga/compat/boost/*.hpp amiga/compat/boost/*/*.hpp amiga/compat/boost/*/*/*.hpp)
+
+all: $(OUT)/$(PROG) package
+
+$(BUILD)/$(PROG).debug: $(OBJS)
+	@mkdir -p $(BUILD)
+	$(CXX) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
+
+$(OUT)/$(PROG): $(BUILD)/$(PROG).debug
+	@mkdir -p $(OUT)
+	$(STRIP) -o $@ $<
+
+package: $(OUT)/$(PROG) AMIGA_PORT.md README.md amiga/Licences.txt amiga/config.xml
+	mkdir -p $(OUT)/User $(OUT)/Res $(OUT)/ROMs
+	cp $(CB)/res/tilemap.bin $(CB)/res/tilepatch.bin $(CB)/res/gamecontrollerdb.txt $(OUT)/Res/
+	cp amiga/config.xml $(OUT)/Res/config.xml
+	cp $(CB)/roms/roms.txt $(OUT)/ROMs/roms.txt
+	cp AMIGA_PORT.md $(OUT)/ReadMe
+	cp $(CB)/docs/license.txt $(OUT)/LICENSE.txt
+	cp $(CB)/README.md $(OUT)/README-Cannonball.txt
+	cp amiga/Licences.txt $(OUT)/Licences.txt
+	cp amiga/icons/Cannonball.info amiga/icons/ReadMe.info $(OUT)/
+	for f in LICENSE.txt README-Cannonball.txt Licences.txt; do \
+	    cp amiga/icons/ReadMe.info $(OUT)/$$f.info; done
+	cp amiga/icons/ReadMe.info $(OUT)/ROMs/roms.txt.info
+	for d in User Res ROMs; do cp amiga/icons/Data.info $(OUT)/$$d.info; done
+	cp amiga/icons/Cannonball-drawer.info $(BUILD)/Cannonball.info
+	cp amiga/Install-Cannonball amiga/Install-Cannonball.info $(BUILD)/
+	# Cannonball's licence: a changed build carries its complete source
+	rm -rf $(OUT)/Source && mkdir -p $(OUT)/Source/cannonball $(OUT)/Source/port
+	cp -R $(CB)/src $(CB)/res $(CB)/roms $(CB)/docs $(CB)/cmake $(CB)/README.md $(OUT)/Source/cannonball/
+	cp -R amiga package tools tests AMIGA_PORT.md README.md $(OUT)/Source/port/
+	cp amiga/icons/Data.info $(OUT)/Source.info
+
+$(OBJDIR)/src/%.o: $(CB)/src/main/%.cpp $(SHIM)
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+$(OBJDIR)/amiga/%.o: amiga/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+clean:
+	rm -rf $(BUILD)
+
+.PHONY: all package clean
