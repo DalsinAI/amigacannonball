@@ -15,7 +15,8 @@ Japanese tracks, a widescreen and a high-resolution road).
 It runs the original arcade game's data: you need your own OutRun ROMs
 (revision B). They are not in this archive and never will be.
 
-Status: host tests pass; not yet built in the stove or run in a lab.
+Status: host tests pass; built in Cradle's os32-gcc16-open6 stove; not yet
+run in a lab.
 
 
 What you need
