@@ -1,0 +1,27 @@
+Cannonball: licences
+====================
+
+The game: Cannonball, the enhanced OutRun engine, by Chris White and the
+Cannonball team, https://github.com/djyt/cannonball.
+
+- The program is under Cannonball's own licence (LICENSE.txt): it may
+  not be sold or used in a commercial product or activity, a changed
+  build must come with its complete source, and the copyright notice
+  must go with it. This is a changed build: its complete source, upstream
+  at the commit it was built from with the Amiga patches applied, and the
+  port's own files, are in the Source drawer.
+- OutRun is a trademark of the SEGA Corporation. Neither Cannonball nor
+  this port is affiliated with SEGA.
+- The OutRun ROMs are not here. Cannonball runs the original arcade
+  game's data, and those are the player's own: Install-Cannonball copies
+  them from the player's drawer or disk into ROMs.
+- Res/tilemap.bin, Res/tilepatch.bin and Res/gamecontrollerdb.txt come
+  with Cannonball's source (gamecontrollerdb.txt is the SDL game
+  controller database, zlib licence).
+- SDL 2 is GFOpenUp's (LIBS:GFOpenGPU/SDL2.module), not in this drawer.
+- The Amiga port's own files (amiga/, AMIGA_PORT.md, package/, tools/,
+  tests/), among them the small stand-in for the Boost calls Cannonball
+  makes (amiga/compat/boost, our own code), are under Cannonball's
+  licence, like the game. The GlowIcon art is The AmiCradle Team's own.
+
+Copyright (c) 2026 AmiCradle Team.

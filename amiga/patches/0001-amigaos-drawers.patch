@@ -1,0 +1,69 @@
+diff --git a/src/main/frontend/config.cpp b/src/main/frontend/config.cpp
+index ee21251..c213d27 100644
+--- a/src/main/frontend/config.cpp
++++ b/src/main/frontend/config.cpp
+@@ -34,9 +34,24 @@ typedef boost::property_tree::xml_writer_settings<char> xml_writer_settings;
+ 
+ Config config;
+ 
++// Where the game keeps its files. On the Amiga: the drawer's ROMs (the
++// player's own OutRun ROMs), Res (the port's files) and User (settings,
++// scores), whatever the Shell's current directory.
++#ifdef __amigaos__
++#define CB_CONFIG_FILE "PROGDIR:User/config.xml"
++#define CB_ROM_PATH    "PROGDIR:ROMs/"
++#define CB_RES_PATH    "PROGDIR:Res/"
++#define CB_SAVE_PATH   "PROGDIR:User/"
++#else
++#define CB_CONFIG_FILE "./config.xml"
++#define CB_ROM_PATH    "roms/"
++#define CB_RES_PATH    "res/"
++#define CB_SAVE_PATH   "./"
++#endif
++
+ Config::Config(void)
+ {
+-    data.cfg_file = "./config.xml";
++    data.cfg_file = CB_CONFIG_FILE;
+     
+     // Setup default sounds
+     music_t magical, breeze, splash;
+@@ -87,9 +102,9 @@ void Config::load()
+     // ------------------------------------------------------------------------
+     // Data Settings
+     // ------------------------------------------------------------------------
+-    data.rom_path         = pt_config.get("data.rompath", "roms/");  // Path to ROMs
+-    data.res_path         = pt_config.get("data.respath", "res/");   // Path to ROMs
+-    data.save_path        = pt_config.get("data.savepath", "./");    // Path to Save Data
++    data.rom_path         = pt_config.get("data.rompath", CB_ROM_PATH);  // Path to ROMs
++    data.res_path         = pt_config.get("data.respath", CB_RES_PATH);  // Path to ROMs
++    data.save_path        = pt_config.get("data.savepath", CB_SAVE_PATH); // Path to Save Data
+     data.crc32            = pt_config.get("data.crc32", 1);
+ 
+     data.file_scores      = data.save_path + "hiscores.xml";
+diff --git a/src/main/main.cpp b/src/main/main.cpp
+index 6151457..71d6ef3 100644
+--- a/src/main/main.cpp
++++ b/src/main/main.cpp
+@@ -29,6 +29,10 @@
+ #include "engine/ooutputs.hpp"
+ #include "engine/omusic.hpp"
+ 
++#ifdef __amigaos__
++extern "C" void amiga_no_roms(const char *rom_path); // amiga/amiga_start.c
++#endif
++
+ // Direct X Haptic Support.
+ // Fine to include on non-windows builds as dummy functions used.
+ #include "directx/ffeedback.hpp"
+@@ -298,6 +302,10 @@ int main(int argc, char* argv[])
+     {
+         config.load(); // Load config.XML file
+         ok = roms.load_revb_roms(config.sound.fix_samples);
++#ifdef __amigaos__
++        if (!ok)
++            amiga_no_roms(config.data.rom_path.c_str()); // says so on Workbench too
++#endif
+     }
+     if (!ok)
+     {

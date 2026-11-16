@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Cannonball's GlowIcon art: a red open-top sports car seen from behind,
+     racing down a coast road towards a low sun, palm trees beside it. The
+     AmiCradle Team's own drawing. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3a8fe0"/><stop offset="0.6" stop-color="#9fd3ff"/><stop offset="1" stop-color="#ffd8a0"/>
+    </linearGradient>
+    <linearGradient id="road" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7d7d86"/><stop offset="1" stop-color="#3c3c44"/>
+    </linearGradient>
+    <linearGradient id="car" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff5a4a"/><stop offset="1" stop-color="#9a0c0c"/>
+    </linearGradient>
+  </defs>
+  <rect x="6" y="6" width="116" height="116" rx="10" fill="url(#sky)" stroke="#1d3d6b" stroke-width="3"/>
+  <!-- sun and sea -->
+  <circle cx="64" cy="58" r="12" fill="#ffe46b"/>
+  <rect x="8" y="58" width="112" height="8" fill="#2f78c4"/>
+  <!-- grass -->
+  <path d="M8 64 H120 V120 H8z" fill="#5bb04a"/>
+  <!-- road towards the horizon -->
+  <path d="M58 62 H70 L118 120 H10z" fill="url(#road)"/>
+  <path d="M63 64 h2 l2 10 h-6z M61 80 h6 l3 16 h-12z" fill="#f2f2f2"/>
+  <path d="M58 62 L10 120 h8 L60 62z M70 62 L118 120 h-8 L68 62z" fill="#e8e8e8"/>
+  <!-- palm trees -->
+  <g stroke="#5a3a17" stroke-width="3" fill="none">
+    <path d="M22 96 q2 -16 -2 -30"/><path d="M104 96 q-2 -16 2 -30"/>
+  </g>
+  <g fill="#2d8a2d" stroke="#145214" stroke-width="1">
+    <path d="M20 66 q-10 -2 -14 6 q8 -4 14 -6z M20 66 q10 -6 16 0 q-8 -2 -16 0z M20 66 q-2 -10 6 -14 q-4 8 -6 14z"/>
+    <path d="M106 66 q10 -2 14 6 q-8 -4 -14 -6z M106 66 q-10 -6 -16 0 q8 -2 16 0z M106 66 q2 -10 -6 -14 q4 8 6 14z"/>
+  </g>
+  <!-- the car from behind -->
+  <g stroke="#3d0505" stroke-width="2" stroke-linejoin="round">
+    <rect x="38" y="104" width="12" height="12" rx="3" fill="#1d1d1d"/>
+    <rect x="78" y="104" width="12" height="12" rx="3" fill="#1d1d1d"/>
+    <path d="M36 98 q2 -12 14 -14 h28 q12 2 14 14 v10 h-56z" fill="url(#car)"/>
+    <path d="M48 86 q4 -6 16 -6 q12 0 16 6z" fill="#bfe6ff" stroke="#12324d" stroke-width="1.5"/>
+    <rect x="40" y="99" width="10" height="4" rx="1" fill="#ffcf3b" stroke-width="1"/>
+    <rect x="78" y="99" width="10" height="4" rx="1" fill="#ffcf3b" stroke-width="1"/>
+  </g>
+  <!-- the driver's blond hair -->
+  <circle cx="58" cy="82" r="4" fill="#ffd27a" stroke="#8a5a10" stroke-width="1"/>
+  <circle cx="70" cy="82" r="4" fill="#3a2410" stroke="#000" stroke-width="1"/>
+</svg>
